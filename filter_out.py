@@ -25,13 +25,24 @@ def filter_by_not_contained_letters(letters: tuple,
 
 
 def filter_by_contained_letters(letters: str, words: Sequence) -> Sequence:
-    if len(words) == 1:
-        return words
-    tt = str.maketrans(dict.fromkeys(string.punctuation))
-    list_of_ltrs = letters.translate(tt).split()
+    """
+    Оставляет слова, в которых есть нужные нам буквы, но не на проверенных позициях
+    """
     positions: dict[str, list[str]] = {}
     x = None
     cont_letters = []
+
+    if len(words) == 1:
+        return words
+
+    # создаем словарь для перевода (замены знаков пунктуации на пробел)
+    tt = str.maketrans(dict.fromkeys(string.punctuation, ' '))
+
+    # создаем список букв и цифр без пробелов и знаков пунктуации
+    list_of_ltrs = letters.translate(tt).split()
+
+    # формируем список букв, содержащихся в слове,
+    # и словаря {буква: позиция}
     for i in list_of_ltrs:
         if i.isalpha():
             cont_letters.append(i)
@@ -39,9 +50,11 @@ def filter_by_contained_letters(letters: str, words: Sequence) -> Sequence:
         else:
             positions.setdefault(i, []).append(x)
 
+    # отбираем слова, в которых есть наши буквы
     for letter in cont_letters:
         words = [word for word in words if letter in word]
 
+    # отбираем слова, в которых наши буквы не на тех самых позициях
     for k, v in positions.items():
         for i in v:
             words = [word for word in words if i != word[int(k) - 1]]
